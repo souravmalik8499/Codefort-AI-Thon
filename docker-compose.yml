@@ -1,0 +1,41 @@
+version: "3.8"
+
+services:
+  nats-server:
+    image: nats:latest
+    container_name: nats-server
+    ports:
+      - "4222:4222"
+
+  backend:
+    build: ./backend
+    container_name: backend-server
+    ports:
+      - "5000:5000"
+    depends_on:
+      - nats-server
+    volumes:
+      - ./backend:/app
+    environment:
+      - NODE_ENV=production
+
+  execution-service:
+    build: ./backend
+    container_name: execution-service
+    depends_on:
+      - nats-server
+    volumes:
+      - ./backend:/app
+    command: ["node", "executionService.js"]
+
+  frontend:
+    build: ./frontend
+    container_name: frontend-client
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend:/app
+    environment:
+      - NODE_ENV=production
