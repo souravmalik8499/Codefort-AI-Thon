@@ -1,0 +1,30 @@
+version: "3.8"
+
+services:
+  server:
+    build: ./server
+    ports:
+      - "3000:3000"
+    depends_on:
+      - nats-server
+    networks:
+      - Code-Sync
+
+  client:
+    build: ./client
+    ports:
+      - "3001:3001"
+    networks:
+      - Code-Sync
+
+  nats-server:
+    image: nats:latest
+    container_name: nats-server
+    ports:
+      - "4222:4222"
+    networks:
+      - Code-Sync
+
+networks:
+  Code-Sync:
+    driver: bridge
